@@ -41,24 +41,6 @@ network_release_cb(void) {
 }
 
 static mender_err_t
-authentication_success_cb(void) {
-    LOG_INF("authentication_success_cb");
-
-    mender_err_t ret = MENDER_OK;
-    if (MENDER_OK != (ret = mender_flash_confirm_image())) {
-        LOG_ERR("Unable to validate the image");
-    }
-
-    return ret;
-}
-
-static mender_err_t
-authentication_failure_cb(void) {
-    LOG_INF("authentication_failure_cb");
-    return MENDER_OK;
-}
-
-static mender_err_t
 deployment_status_cb(mender_deployment_status_t status, char *desc) {
     LOG_INF("deployment_status_cb: %s", desc);
     return MENDER_OK;
@@ -102,13 +84,10 @@ main(void) {
     LOG_INF("   Identity:      '{\"%s\": \"%s\"}'", mender_identity.name, mender_identity.value);
 
     /* Initialize mender-client */
-    mender_client_config_t    mender_client_config    = { .artifact_name                = ARTIFACT_NAME,
-                                                          .device_type                  = DEVICE_TYPE,
+    mender_client_config_t    mender_client_config    = { .device_type                  = DEVICE_TYPE,
                                                           .recommissioning              = false };
     mender_client_callbacks_t mender_client_callbacks = { .network_connect        = network_connect_cb,
                                                           .network_release        = network_release_cb,
-                                                          .authentication_success = authentication_success_cb,
-                                                          .authentication_failure = authentication_failure_cb,
                                                           .deployment_status      = deployment_status_cb,
                                                           .restart                = restart_cb,
                                                           .get_identity           = get_identity_cb,
